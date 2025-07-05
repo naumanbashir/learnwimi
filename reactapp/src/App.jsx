@@ -1,35 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import TodoCard from "./components/TodoCard.jsx";
+import TodoInput from "./components/TodoInput.jsx";
+import TodoList from "./components/TodoList.jsx";
+import {useState} from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const [todos, setTodos] = useState([
+        'Go to Gym',
+        'Do my breakfast',
+        'Study some tutorials',
+    ]);
+
+    const [todoValue, setTodoValue] = useState("");
+    const [editingIndex, setEditingIndex] = useState(null);
+
+    const handleAddTodos = (newTodo) => {
+        let newTodos = [...todos, newTodo];
+        setTodos(newTodos);
+    }
+
+    const handleDeleteTodo = (index) => {
+        const newTodos = todos.filter((todo, todoIndex) => todoIndex !== index);
+        setTodos(newTodos);
+    }
+
+    const handleEditTodo = (index) => {
+        const todoToBeEdited = todos[index];
+        setTodoValue(todoToBeEdited);
+        setEditingIndex(index);
+    }
+
+    const handleUpdateTodo = (updatedTodo) => {
+        if (editingIndex === null || !updatedTodo.trim()) return;
+        setTodos((prev) => {
+            return prev.map((todo, todoIndex) => {
+                return (editingIndex === todoIndex) ? updatedTodo : todo;
+            })
+        })
+        setEditingIndex(null);
+        setTodoValue("");
+    }
+
+    return (
+        <>
+            <TodoInput handleAddTodos={handleAddTodos}
+                       handleUpdateTodo={handleUpdateTodo}
+                       todoValue={todoValue}
+                       setTodoValue={setTodoValue}
+                       isEdited={editingIndex !== null}
+            />
+            <TodoList todos={todos}
+                      handleDeleteTodo={handleDeleteTodo}
+                      handleEditTodo={handleEditTodo}
+            />
+        </>
+    )
 }
 
 export default App
